@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { routerTask } from "./src/routes/task.routes.js";
 import { routerUser } from "./src/routes/user.routes.js";
-import startDB from "./config/db.js";
+import { startDB } from "./src/config/db.js";
 dotenv.config();
 
 const app = express();
