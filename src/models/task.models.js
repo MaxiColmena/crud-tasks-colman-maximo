@@ -9,13 +9,14 @@ export const Task = sequelize.define("tasks",{
     },
     title: {
         type: DataTypes.STRING(100),
+        unique: true,
         allowNull: false,
     },
     description: {
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    isColmplete: {
+    isComplete: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     }

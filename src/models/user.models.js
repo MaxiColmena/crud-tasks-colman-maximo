@@ -15,7 +15,7 @@ export const User = sequelize.define("users",{
         type: DataTypes.STRING(100),
         allowNull: false,
     },
-    isColmplete: {
+    isComplete: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     }
