@@ -8,7 +8,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 app.use(express.json());
-app.use("/api", CharacterRoutes);
+app.use("/api", routerTask);
+app.use("/api", routerUser);
 
 startDB().then(()=>{app.listen(PORT, ()=>{
     console.log("Escuchando en el puerto:", PORT);

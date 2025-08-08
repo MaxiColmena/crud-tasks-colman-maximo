@@ -17,7 +17,7 @@ export const createUser = async(req, res) => {
 
     try {
         //Validacion para que los datos no se reciban vacios.
-        if(name === undefined || title === "") return res.status(400).json({errorMessage: "Debe completar el campo 'name', no puede estar vacio."})
+        if(name === undefined || name === "") return res.status(400).json({errorMessage: "Debe completar el campo 'name', no puede estar vacio."})
         if(email === undefined || email === "") return res.status(400).json({errorMessage: "Debe completar el campo 'email', no puede estar vacio."})
         if(password === undefined || password === "") return res.status(400).json({errorMessage: "Debe completar el campo 'password', no puede estar vacio."})
 
@@ -35,7 +35,7 @@ export const getAllUser = async(req, res) => {
     try {
         const user = await User.findAll();
         if(user.length === 0) return res.json({Message: "No existen usuarios en la base de datos"});
-        res.json(task)
+        res.json(user)
     } catch (error) {
         res.status(500).json({message: error.message});
     }
