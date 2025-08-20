@@ -14,5 +14,8 @@ export const User = sequelize.define("users",{
     password: {
         type: DataTypes.STRING(100),
         allowNull: false,
-    }
-});
+    },
+    
+},{
+        timestamps: false
+    });

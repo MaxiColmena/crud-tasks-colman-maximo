@@ -1,102 +1,69 @@
-import { where } from "sequelize";
+
 import { Task } from "../models/task.models.js";
 
-//Esta funcionalidad crea las tareas en nuestra base de datos
-export const createTask = async(req, res) => {
+// Obtener todas las tareas
+export const getAllTask = async (req, res) => {
+  try {
+    const tasks = await Task.findAll(); // trae todas las tareas
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al obtener las tareas" });
+  }
+};
 
-    //Esta funcionalidad elimina los espacios al principio y al final de las cadenas de texto(string)
-    if(req.body){
-        for (let value in req.body){
-            if (typeof req.body[value] === "string"){
-                req.body[value] = req.body[value].trim();
-            }
-        }
-    }
+// Obtener tarea por id
+export const getTaskById = async (req, res) => {
+  try {
+    const tasks = await Task.findByPk();
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al obtener la tarea" });
+  }
+};
 
-    const {title, description, isComplete } = req.body;
+// Crear una nueva tarea
+export const createTask = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const newTask = await Task.create({ title, description });
+    res.status(201).json(newTask);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al crear la tarea" });
+  }
+};
 
-    try {
-        //Validacion para que los datos no se reciban vacios.
-        if(title === undefined || title === "") return res.status(400).json({errorMessage: "Debe completar el campo 'title', no puede estar vacio."})
-        if(description === undefined || description === "") return res.status(400).json({errorMessage: "Debe completar el campo 'description', no puede estar vacio."})
-        if(typeof isComplete !== "boolean") return res.status(400).json({Message: "IsComplete debe ser booleano"});
+// Actualizar una tarea por id
+export const updateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const task = await Task.findByPk(id);
 
-        const task = await Task.create({title, description, isComplete});
-        res.status(200).json({Message: "Tarea creada con éxito: ", task});
-    } catch (error) {
-        console.log("Error en la creación de la tarea: ", error)
-        res.status(500).json({Message: error.message});
-    }
-}
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-//Esta funcionalidad trae a todas las tareas
+    await task.update({ title, description });
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al actualizar la tarea" });
+  }
+};
 
-export const getAllTask = async(req, res) => {
-    try {
-        const task = await Task.findAll();
-        if(task.length === 0) return res.json({Message: "No existen tareas en la base de datos"});
-        res.json(task)
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-}
+// Eliminar una tarea por id
+export const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findByPk(id);
 
-//Esta funcionalidad trae las tareas por Id estrictamente
+    if (!task) return res.status(404).json({ message: "Tarea no encontrada" });
 
-export const getTaskById = async(req, res) => {
-    try {
-        const task = await Task.findByPk(req.params.id);
-        if(task) return res.status(200).json(task);
-
-        return res.status(404).json({Message: "La tarea no existe en la base de datos."});
-
-    } catch (error) {
-        res.status(500).json({Message: error.message});
-    }
-}
-
-//Esta funcionalidad actualiza la información de las tareas por Id
-
-export const updateTask = async(req, res) =>{
-    
-   const {title, description, isComplete } = req.body;
-    
-    //quita los espacios al principio y al final
-    if(req.body){
-        for (let value in req.body){
-            if (typeof req.body[value] === "string"){
-                req.body[value] = req.body[value].trim();
-            }
-        }
-    }
-    
-    try {
-        //validación para que el nombre sea unico
-        if (title){
-        const titleUnique = await Task.findOne({where: {title}})
-        if(titleUnique) return res.status(400).json({errorMessage: "El nombre debe ser único por tarea."});
-        }
-
-        const [updated] = await Task.update({title, description, isCompleted}, {where: {id: req.params.id}});
-    //si las filas afectadas son mayores a 0, la tarea se va a actualiar con éxito
-    if (updated === 0) res.status(400).json({Message: "La tarea no existe o no fue encontrada"})
-
-    return res.status(200).json({Message: "La tarea fue actualizada con éxito"});
-
-    } catch (error) {
-        res.status(500).json({Message: error.message});
-    }
-}
-
-//Esta funcionalidad elimina a las tareas por Id estrictamente
-
-export const deleteTask = async(req, res) =>{
-    try {
-        const deleted = await Task.destroy({where: {id: req.params.id}});
-        //es para hacer un delete a la tarea que coincida con el id que deseamos eliminar
-        if(deleted) res.json({message: "La tarea fue borrada de la base de datos"});
-        res.status(404).json({message: "La tarea no fue encontrada"})
-    } catch (error) {
-    res.status(500).json({Message: error.message});  
-    }
-}
+    await task.destroy();
+    res.json({ message: "Tarea eliminada" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al eliminar la tarea" });
+  }
+};

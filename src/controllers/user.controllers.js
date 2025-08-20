@@ -1,5 +1,7 @@
-import { where } from "sequelize";
+
 import { User } from "../models/user.models.js";
+import { Op } from "sequelize";
+
 
 //Esta funcionalidad crea los usuarios en nuestra base de datos
 export const createUser = async(req, res) => {
@@ -22,7 +24,7 @@ export const createUser = async(req, res) => {
         if(password === undefined || password === "") return res.status(400).json({errorMessage: "Debe completar el campo 'password', no puede estar vacio."})
 
         const user = await User.create({name, email, password});
-        res.status(200).json({Message: "El usuario a sido creado con éxito: ", user});
+        res.status(201).json({Message: "El usuario ha sido creado con éxito: ", user});
     } catch (error) {
         console.log("Error en la creación del usuario: ", error)
         res.status(500).json({Message: error.message});
@@ -33,8 +35,8 @@ export const createUser = async(req, res) => {
 
 export const getAllUser = async(req, res) => {
     try {
-        const user = await User.findAll();
-        if(user.length === 0) return res.json({Message: "No existen usuarios en la base de datos"});
+        const users = await User.findAll();
+        if(users.length === 0) return res.status(200).json({Message: "No existen usuarios en la base de datos"});
         res.json(user)
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -73,7 +75,7 @@ export const updateUser = async(req, res) =>{
     try {
         //validación para que el nombre sea unico
         if (name){
-        const nameUnique = await User.findOne({where: {name}})
+        const nameUnique = await User.findOne({ where: { name, id: { [Op.ne]: req.params.id } } });
         if(nameUnique) return res.status(400).json({errorMessage: "El nombre debe ser único por usuario."});
         }
 
@@ -94,8 +96,8 @@ export const deleteUser = async(req, res) =>{
     try {
         const deleted = await User.destroy({where: {id: req.params.id}});
         //es para hacer un delete al usuario que coincida con el id que deseamos eliminar
-        if(deleted) res.json({message: "El usuario fue borrado de la base de datos"});
-        res.status(404).json({message: "El usuario no fue encontrado"})
+    if(deleted) return res.json({message: "El usuario fue borrado de la base de datos"});
+    return res.status(404).json({message: "El usuario no fue encontrado"});
     } catch (error) {
     res.status(500).json({Message: error.message});  
     }
