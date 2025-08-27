@@ -1,4 +1,3 @@
-import { where } from "sequelize";
 import { Task } from "../models/task.models.js";
 
 //Esta funcionalidad crea las tareas en nuestra base de datos

@@ -1,4 +1,3 @@
-import { where } from "sequelize";
 import { User } from "../models/user.models.js";
 
 //Esta funcionalidad crea los usuarios en nuestra base de datos
